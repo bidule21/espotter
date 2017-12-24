@@ -13,6 +13,7 @@ __status__ = "Alpha"
 ################################################################################################################################
 
 from time import sleep
+
 import numpy as np
 import copy
 import cv2
@@ -55,7 +56,7 @@ def main():
 
 		# End here if there are no (more) frames
 		if ret == False:
-			print str("could not open input")
+			print str("Could not open feed!")
 			break
 
 		#r = cv2.selectROI(frame)
@@ -74,10 +75,10 @@ def main():
 		r = (670, 2, 829, 861)
 		frame = frame[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
 
-		# Convert frame to black & white
+		# Convert frame to grayscale
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-		# Blurring the b&w frame
+		# Blurring the grayscale frame and adjust gamma
 		blurred = cv2.GaussianBlur(gray, (5, 5), 5)
 		blurred = adjust_gamma(blurred, 5)
 
@@ -101,6 +102,7 @@ def main():
 		cv2.imshow("monitor_fgmask",monitor_fgmask)
 
 		# https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html
+		# We dont want erosion at this point as we have adjusted the gamma
 		dilation = cv2.dilate(fgmask, kernel, iterations=5)
 
 		monitor_dilation = copy.copy(dilation)
@@ -118,10 +120,11 @@ def main():
 			center = (int(x),int(y))
 			radius = int(radius)
 
-			# Limit to contours large then
+			# Limit to contours equal/larger then a shot
 			if radius >= 10:
 				cv2.circle(frame,center,radius,(0,255,0),3,8)
-				sleep(0.2)
+				# Give some time to look at
+				sleep(0.1)
 			else:
 				continue	
 
