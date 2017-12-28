@@ -4,7 +4,7 @@
 """espotter.py: Nothing to know at this point"""
 
 __author__      = "w3llschmidt@gmail.com"
-__copyright__   = "Copyright 20018, Planet Earth"
+__copyright__   = "Copyright 2018, Planet Earth"
 
 __license__ = "GPL"
 __version__ = "0.1"
@@ -12,11 +12,11 @@ __status__ = "Alpha"
 
 ################################################################################################################################
 
-from time import sleep
-
+import cv2
 import numpy as np
 import copy
-import cv2
+
+from time import sleep
 
 ################################################################################################################################
 
@@ -112,25 +112,30 @@ def main():
 		cv2.imshow("monitor_dilation",monitor_dilation)
 
 		# finding external contours (shot)
-		cnt_frame, contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+		img, contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 		# for each contour plot a circle
 		for contour in contours:
+
+
+
 			(x,y),radius = cv2.minEnclosingCircle(contour)
 			center = (int(x),int(y))
 			radius = int(radius)
 
 			# Limit to contours equal/larger then a shot
 			if radius >= 10:
+
+				shotcount +=1
+
 				cv2.circle(frame,center,radius,(0,255,0),3,8)
-				# Give some time to look at
-				sleep(0.1)
+
+				position = (center[0]-10, center[1]-18)
+
+				cv2.putText(frame, str(shotcount), position, font, 0.9, (255, 255, 255), 1, cv2.LINE_AA)
+
 			else:
 				continue	
-
-			# Shotcounter
-			# shotcount +=1
-			# cv2.putText(frame, str(shotcount), (1780, 80), font, 2.0, (0, 255, 0), 2, cv2.LINE_AA)
 
 		# Framecounter	
 		framecount +=1
